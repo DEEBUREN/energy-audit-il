@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Energy Audit Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+            color: #333;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        h1 {
+            text-align: center;
+            color: #27ae60;
+            margin-bottom: 5px;
+            font-size: 2.5rem;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 40px;
+            font-size: 16px;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 15px;
+        }
+
+        .nav-tab {
+            padding: 10px 20px;
+            border: none;
+            background: transparent;
+            color: #666;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -17px;
+        }
+
+        .nav-tab:hover {
+            color: #27ae60;
+        }
+
+        .nav-tab.active {
+            color: #27ae60;
+            border-bottom-color: #27ae60;
+        }
+
+        .content-section {
+            display: none;
+        }
+
+        .content-section.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .calculator-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .calc-tab {
+            padding: 8px 16px;
+            border: 2px solid #27ae60;
+            background: white;
+            color: #27ae60;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 13px;
+            transition: 0.3s;
+        }
+
+        .calc-tab:hover {
+            background: #27ae60;
+            color: white;
+        }
+
+        .calc-tab.active {
+            background: #27ae60;
+            color: white;
+        }
+
+        .calc-content {
+            display: none;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .calc-content.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 15px;
+            transition: 0.3s;
+            font-family: inherit;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #27ae60;
+            box-shadow: 0 0 8px rgba(39, 174, 96, 0.2);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        button {
+            flex: 1;
+            padding: 13px;
+            background: #27ae60;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background: #229954;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(39, 174, 96, 0.3);
+        }
+
+        .result-box {
+            margin-top: 20px;
+            padding: 20px;
+            background: #e8f5e9;
+            border-left: 5px solid #27ae60;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .result-box.show {
+            display: block;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result-item {
+            margin: 12px 0;
+            font-size: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .result-label {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .result-value {
+            font-size: 18px;
+            color: #27ae60;
+            font-weight: bold;
+        }
+
+        .formula {
+            margin-top: 15px;
+            padding: 12px;
+            background: white;
+            border-radius: 6px;
+            font-size: 12px;
+            color: #666;
+            border-left: 3px solid #27ae60;
+        }
+
+        section {
+            margin: 20px 0;
+        }
+
+        section h2 {
+            color: #27ae60;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+
+        section p {
+            line-height: 1.8;
+            color: #555;
+            margin-bottom: 12px;
+        }
+
+        ul {
+            margin-left: 25px;
+            margin-bottom: 15px;
+        }
+
+        ul li {
+            margin-bottom: 8px;
+            color: #555;
+            line-height: 1.6;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        th {
+            background: #27ae60;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td {
+            border-bottom: 1px solid #eee;
+            padding: 12px;
+            font-size: 14px;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        tr:last-child {
+            background: #e8f5e9;
+            font-weight: bold;
+        }
+
+        .success-message {
+            padding: 15px;
+            background: #c8e6c9;
+            color: #2e7d32;
+            border-radius: 6px;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+
+        .error-message {
+            padding: 15px;
+            background: #ffcdd2;
+            color: #c62828;
+            border-radius: 6px;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .nav-tabs {
+                gap: 5px;
+            }
+
+            .nav-tab {
+                padding: 8px 12px;
+                font-size: 12px;
+            }
+
+            table {
+                font-size: 12px;
+            }
+
+            td, th {
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- HEADER -->
+        <h1>⚡ Energy Audit of Civil Block</h1>
+        <p class="subtitle">Advanced Energy Consumption Calculator for Electrical Loads</p>
+
+        <!-- MAIN NAVIGATION -->
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="openTab(event, 'home')">Home</button>
+            <button class="nav-tab" onclick="openTab(event, 'about')">About</button>
+            <button class="nav-tab" onclick="openTab(event, 'calculator')">Calculator</button>
+            <button class="nav-tab" onclick="openTab(event, 'analysis')">Analysis</button>
+            <button class="nav-tab" onclick="openTab(event, 'results')">Results</button>
+            <button class="nav-tab" onclick="openTab(event, 'contact')">Contact</button>
+        </div>
+
+        <!-- HOME SECTION -->
+        <div id="home" class="content-section active">
+            <section>
+                <h2>Welcome to Energy Audit Project</h2>
+                <p>This comprehensive energy audit project analyzes the electrical consumption patterns of a Civil Block and provides detailed recommendations for energy conservation.</p>
+                
+                <h3 style="color: #27ae60; margin-top: 20px; margin-bottom: 10px;">Project Overview:</h3>
+                <ul>
+                    <li><strong>Project Title:</strong> Energy Audit of Civil Block</li>
+                    <li><strong>Department:</strong> Electrical & Electronics Engineering</li>
+                    <li><strong>Focus Area:</strong> Electrical load analysis and energy optimization</li>
+                    <li><strong>Objective:</strong> Identify inefficiencies and recommend energy-saving solutions</li>
+                </ul>
+
+                <p style="margin-top: 20px;">Use the <strong>Calculator</strong> tab to analyze energy consumption for different electrical loads and estimate costs.</p>
+            </section>
+        </div>
+
+        <!-- ABOUT SECTION -->
+        <div id="about" class="content-section">
+            <section>
+                <h2>About Energy Audit</h2>
+                
+                <h3 style="color: #27ae60; margin-top: 15px; margin-bottom: 10px;">What is Energy Audit?</h3>
+                <p>An energy audit is a systematic examination of energy usage in a building or facility to identify opportunities for energy conservation and efficiency improvements. It involves detailed analysis of equipment, operational patterns, and consumption data.</p>
+
+                <h3 style="color: #27ae60; margin-top: 15px; margin-bottom: 10px;">Importance of Energy Conservation:</h3>
+                <ul>
+                    <li>Reduces operational and maintenance costs</li>
+                    <li>Minimizes environmental impact and carbon footprint</li>
+                    <li>Promotes sustainable development practices</li>
+                    <li>Improves equipment lifespan and performance</li>
+                    <li>Enhances comfort and working conditions</li>
+                    <li>Supports compliance with energy regulations</li>
+                </ul>
+
+                <h3 style="color: #27ae60; margin-top: 15px; margin-bottom: 10px;">Project Objectives:</h3>
+                <ul>
+                    <li>Identify current energy consumption patterns</li>
+                    <li>Detect inefficiencies in electrical systems</li>
+                    <li>Quantify energy losses across different equipment</li>
+                    <li>Calculate potential cost savings</li>
+                    <li>Provide actionable recommendations for optimization</li>
+                    <li>Establish baseline for future improvements</li>
+                </ul>
+            </section>
+        </div>
+
+        <!-- CALCULATOR SECTION -->
+        <div id="calculator" class="content-section">
+            <h2>Advanced Energy Calculator</h2>
+            <p>Calculate energy consumption and estimated costs for different electrical loads.</p>
+
+            <!-- Calculator Type Tabs -->
+            <div class="calculator-tabs">
+                <button class="calc-tab active" onclick="switchCalc(event, 'fan')">Fan Calculator</button>
+                <button class="calc-tab" onclick="switchCalc(event, 'light')">Light Calculator</button>
+                <button class="calc-tab" onclick="switchCalc(event, 'ac')">AC Calculator</button>
+                <button class="calc-tab" onclick="switchCalc(event, 'custom')">Custom Load</button>
+            </div>
+
+            <!-- FAN CALCULATOR -->
+            <div id="fan" class="calc-content active">
+                <h3 style="color: #27ae60; margin-bottom: 15px;">Fan Energy Consumption Calculator</h3>
+                <div class="form-group">
+                    <label>Number of Fans:</label>
+                    <input type="number" id="fanNum" value="1" min="1">
+                </div>
+                <div class="form-group">
+                    <label>Power Rating (Watts):</label>
+                    <input type="number" id="fanPower" value="60" min="1">
+                </div>
+                <div class="form-group">
+                    <label>Hours Used per Day:</label>
+                    <input type="number" id="fanHours" value="8" min="0.1" step="0.5">
+                </div>
+                <div class="form-group">
+                    <label>Number of Days:</label>
+                    <input type="number" id="fanDays" value="30" min="1">
+                </div>
+                <div class="button-group">
+                    <button onclick="calcFan()">Calculate</button>
+                    <button onclick="clearFan()" style="background: #999;">Clear</button>
+                </div>
+                <div id="fanResult" class="result-box">
+                    <div class="result-item">
+                        <span class="result-label">Total Energy:</span>
+                        <span><span class="result-value" id="fanEnergy">0</span> kWh</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Estimated Cost:</span>
+                        <span class="result-value" id="fanCost">₹0</span>
+                    </div>
+                    <div class="formula">
+                        <strong>Formula:</strong> Energy (kWh) = (Number of Fans × Power Rating × Hours × Days) ÷ 1000<br>
+                        <strong>Cost:</strong> Energy × ₹6 per kWh
+                    </div>
+                </div>
+            </div>
+
+            <!-- LIGHT CALCULATOR -->
+            <div id="light" class="calc-content">
+                <h3 style="color: #27ae60; margin-bottom: 15px;">Light Energy Consumption Calculator</h3>
+                <div class="form-group">
+                    <label>Number of Lights:</label>
+                    <input type="number" id="lightNum" value="1" min="1">
+                </div>
+                <div class="form-group">
+                    <label>Power Rating (Watts):</label>
+                    <input type="number" id="lightPower" value="20" min="1">
+                </div>
+                <div class="form-group">
+                    <label>Hours Used per Day:</label>
+                    <input type="number" id="lightHours" value="10" min="0.1" step="0.5">
+                </div>
+                <div class="form-group">
+                    <label>Number of Days:</label>
+                    <input type="number" id="lightDays" value="30" min="1">
+                </div>
+                <div class="button-group">
+                    <button onclick="calcLight()">Calculate</button>
+                    <button onclick="clearLight()" style="background: #999;">Clear</button>
+                </div>
+                <div id="lightResult" class="result-box">
+                    <div class="result-item">
+                        <span class="result-label">Total Energy:</span>
+                        <span><span class="result-value" id="lightEnergy">0</span> kWh</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Estimated Cost:</span>
+                        <span class="result-value" id="lightCost">₹0</span>
+                    </div>
+                    <div class="formula">
+                        <strong>Formula:</strong> Energy (kWh) = (Number of Lights × Power Rating × Hours × Days) ÷ 1000<br>
+                        <strong>Cost:</strong> Energy × ₹6 per kWh
+                    </div>
+                </div>
+            </div>
+
+            <!-- AC CALCULATOR -->
+            <div id="ac" class="calc-content">
+                <h3 style="color: #27ae60; margin-bottom: 15px;">Air Conditioner Energy Consumption Calculator</h3>
+                <div class="form-group">
+                    <label>Number of AC Units:</label>
+                    <input type="number" id="acNum" value="1" min="1">
+                </div>
+                <div class="form-group">
+                    <label>Power Rating (Watts):</label>
+                    <input type="number" id="acPower" value="1500" min="1">
+                </div>
+                <div class="form-group">
+                    <label>Hours Used per Day:</label>
+                    <input type="number" id="acHours" value="6" min="0.1" step="0.5">
+                </div>
+                <div class="form-group">
+                    <label>Number of Days:</label>
+                    <input type="number" id="acDays" value="30" min="1">
+                </div>
+                <div class="button-group">
+                    <button onclick="calcAC()">Calculate</button>
+                    <button onclick="clearAC()" style="background: #999;">Clear</button>
+                </div>
+                <div id="acResult" class="result-box">
+                    <div class="result-item">
+                        <span class="result-label">Total Energy:</span>
+                        <span><span class="result-value" id="acEnergy">0</span> kWh</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Estimated Cost:</span>
+                        <span class="result-value" id="acCost">₹0</span>
+                    </div>
+                    <div class="formula">
+                        <strong>Formula:</strong> Energy (kWh) = (Number of AC × Power Rating × Hours × Days) ÷ 1000<br>
+                        <strong>Cost:</strong> Energy × ₹6 per kWh
+                    </div>
+                </div>
+            </div>
+
+            <!-- CUSTOM CALCULATOR -->
+            <div id="custom" class="calc-content">
+                <h3 style="color: #27ae60; margin-bottom: 15px;">Custom Electrical Load Calculator</h3>
+                <div class="form-group">
+                    <label>Load Name (e.g., Printer, Coffee Machine):</label>
+                    <input type="text" id="customName" value="Equipment" placeholder="Enter equipment name">
+                </div>
+                <div class="form-group">
+                    <label>Quantity:</label>
+                    <input type="number" id="customNum" value="1" min="1">
+                </div>
+                <div class="form-group">
+                    <label>Power Rating (Watts):</label>
+                    <input type="number" id="customPower" value="100" min="1">
+                </div>
+                <div class="form-group">
+                    <label>Hours Used per Day:</label>
+                    <input type="number" id="customHours" value="5" min="0.1" step="0.5">
+                </div>
+                <div class="form-group">
+                    <label>Number of Days:</label>
+                    <input type="number" id="customDays" value="30" min="1">
+                </div>
+                <div class="button-group">
+                    <button onclick="calcCustom()">Calculate</button>
+                    <button onclick="clearCustom()" style="background: #999;">Clear</button>
+                </div>
+                <div id="customResult" class="result-box">
+                    <div class="result-item">
+                        <span class="result-label">Equipment:</span>
+                        <span class="result-value" id="customNameDisplay">-</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Total Energy:</span>
+                        <span><span class="result-value" id="customEnergy">0</span> kWh</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Estimated Cost:</span>
+                        <span class="result-value" id="customCost">₹0</span>
+                    </div>
+                    <div class="formula">
+                        <strong>Formula:</strong> Energy (kWh) = (Quantity × Power Rating × Hours × Days) ÷ 1000<br>
+                        <strong>Cost:</strong> Energy × ₹6 per kWh
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ANALYSIS SECTION -->
+        <div id="analysis" class="content-section">
+            <h2>Energy Analysis</h2>
+            <p>Detailed breakdown of equipment-wise energy consumption in the Civil Block.</p>
+
+            <table>
+                <tr>
+                    <th>Equipment</th>
+                    <th>Quantity</th>
+                    <th>Power (W)</th>
+                    <th>Hours/Day</th>
+                    <th>Daily (kWh)</th>
+                    <th>Monthly (kWh)</th>
+                </tr>
+                <tr>
+                    <td>LED Lights</td>
+                    <td>45</td>
+                    <td>20</td>
+                    <td>10</td>
+                    <td>9.0</td>
+                    <td>270</td>
+                </tr>
+                <tr>
+                    <td>Ceiling Fans</td>
+                    <td>30</td>
+                    <td>60</td>
+                    <td>8</td>
+                    <td>14.4</td>
+                    <td>432</td>
+                </tr>
+                <tr>
+                    <td>Air Conditioners</td>
+                    <td>8</td>
+                    <td>1500</td>
+                    <td>6</td>
+                    <td>72.0</td>
+                    <td>2160</td>
+                </tr>
+                <tr>
+                    <td>Computers</td>
+                    <td>25</td>
+                    <td>300</td>
+                    <td>8</td>
+                    <td>60.0</td>
+                    <td>1800</td>
+                </tr>
+                <tr>
+                    <td>Water Pump</td>
+                    <td>2</td>
+                    <td>750</td>
+                    <td>4</td>
+                    <td>6.0</td>
+                    <td>180</td>
+                </tr>
+                <tr>
+                    <td><strong>TOTAL</strong></td>
+                    <td colspan="4"><strong>Total Daily Energy</strong></td>
+                    <td><strong>4842 kWh/month</strong></td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- RESULTS SECTION -->
+        <div id="results" class="content-section">
+            <h2>Results & Recommendations</h2>
+
+            <h3 style="color: #27ae60; margin-top: 20px; margin-bottom: 10px;">🔴 Energy Losses Identified:</h3>
+            <ul>
+                <li><strong>Inefficient HVAC System:</strong> 28% higher consumption than industry standard</li>
+                <li><strong>Outdated Lighting:</strong> 15% energy waste due to use of halogen bulbs</li>
+                <li><strong>Poor Insulation:</strong> 22% heat loss through windows and doors</li>
+                <li><strong>Phantom Loads:</strong> 8% standby power consumption from inactive equipment</li>
+                <li><strong>Equipment Inefficiency:</strong> 12% performance degradation due to lack of maintenance</li>
+            </ul>
+
+            <h3 style="color: #27ae60; margin-top: 20px; margin-bottom: 10px;">✅ Recommendations for Energy Savings:</h3>
+            <ul>
+                <li><strong>LED Retrofit Program:</strong> Replace all lights with LED → 60% lighting savings</li>
+                <li><strong>HVAC Optimization:</strong> Upgrade to high-efficiency units → 30% HVAC savings</li>
+                <li><strong>Insulation Upgrade:</strong> Improve window sealing and insulation → 20% cooling savings</li>
+                <li><strong>Smart Controls:</strong> Install occupancy sensors and thermostats → 15% overall savings</li>
+                <li><strong>Regular Maintenance:</strong> Preventive upkeep schedule → 10% efficiency improvement</li>
+            </ul>
+
+            <h3 style="color: #27ae60; margin-top: 20px; margin-bottom: 10px;">💰 Financial Impact:</h3>
+            <ul>
+                <li><strong>Current Annual Consumption:</strong> 57,704 kWh</li>
+                <li><strong>Current Annual Cost:</strong> ₹3,46,224 (@ ₹6/kWh)</li>
+                <li><strong>Potential Annual Savings:</strong> ₹86,556 (25% reduction)</li>
+                <li><strong>Implementation Cost Estimate:</strong> ₹2,50,000</li>
+                <li><strong>Payback Period:</strong> 2.9 years</li>
+                <li><strong>ROI (5-year):</strong> 73% net savings</li>
+            </ul>
+        </div>
+
+        <!-- CONTACT SECTION -->
+        <div id="contact" class="content-section">
+            <section>
+                <h2>Contact Information</h2>
+
+                <h3 style="color: #27ae60; margin-top: 15px; margin-bottom: 10px;">Project Details:</h3>
+                <ul style="list-style: none; margin-left: 0;">
+                    <li>📌 <strong>Project Title:</strong> Energy Audit of Civil Block</li>
+                    <li>👤 <strong>Student:</strong> [Your Name]</li>
+                    <li>🏫 <strong>Department:</strong> Electrical & Electronics Engineering</li>
+                    <li>🎓 <strong>Institution:</strong> [Your College Name]</li>
+                </ul>
+
+                <h3 style="color: #27ae60; margin-top: 15px; margin-bottom: 10px;">Contact Details:</h3>
+                <ul style="list-style: none; margin-left: 0;">
+                    <li>📧 <strong>Email:</strong> student@email.com</li>
+                    <li>📱 <strong>Phone:</strong> +91-XXXXXXXXXX</li>
+                    <li>📍 <strong>Address:</strong> [Your College Address]</li>
+                </ul>
+
+                <h3 style="color: #27ae60; margin-top: 15px; margin-bottom: 10px;">Project Duration:</h3>
+                <ul style="list-style: none; margin-left: 0;">
+                    <li>🗓️ <strong>Duration:</strong> [Start Date] to [End Date]</li>
+                    <li>👨‍🏫 <strong>Supervisor:</strong> [Faculty Name]</li>
+                </ul>
+            </section>
+        </div>
+    </div>
+
+    <script>
+        // Open Tab Function
+        function openTab(evt, tabName) {
+            var i, tabcontent, tabs;
+            tabcontent = document.getElementsByClassName("content-section");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].classList.remove("active");
+            }
+            tabs = document.getElementsByClassName("nav-tab");
+            for (i = 0; i < tabs.length; i++) {
+                tabs[i].classList.remove("active");
+            }
+            document.getElementById(tabName).classList.add("active");
+            evt.currentTarget.classList.add("active");
+        }
+
+        // Switch Calculator Tab
+        function switchCalc(evt, calcName) {
+            var i, content;
+            content = document.getElementsByClassName("calc-content");
+            for (i = 0; i < content.length; i++) {
+                content[i].classList.remove("active");
+            }
+            var tabs = document.getElementsByClassName("calc-tab");
+            for (i = 0; i < tabs.length; i++) {
+                tabs[i].classList.remove("active");
+            }
+            document.getElementById(calcName).classList.add("active");
+            evt.currentTarget.classList.add("active");
+        }
+
+        // Validation Function
+        function validate(num, power, hours, days) {
+            if (num <= 0 || power <= 0 || hours <= 0 || days <= 0) {
+                alert('❌ All values must be greater than 0!');
+                return false;
+            }
+            return true;
+        }
+
+        // FAN CALCULATOR
+        function calcFan() {
+            const num = parseFloat(document.getElementById('fanNum').value);
+            const power = parseFloat(document.getElementById('fanPower').value);
+            const hours = parseFloat(document.getElementById('fanHours').value);
+            const days = parseFloat(document.getElementById('fanDays').value);
+
+            if (!validate(num, power, hours, days)) return;
+
+            const energy = (num * power * hours * days) / 1000;
+            const cost = energy * 6;
+
+            document.getElementById('fanEnergy').textContent = energy.toFixed(2);
+            document.getElementById('fanCost').textContent = '₹' + cost.toFixed(2);
+            document.getElementById('fanResult').classList.add('show');
+        }
+
+        function clearFan() {
+            document.getElementById('fanNum').value = '1';
+            document.getElementById('fanPower').value = '60';
+            document.getElementById('fanHours').value = '8';
+            document.getElementById('fanDays').value = '30';
+            document.getElementById('fanResult').classList.remove('show');
+        }
+
+        // LIGHT CALCULATOR
+        function calcLight() {
+            const num = parseFloat(document.getElementById('lightNum').value);
+            const power = parseFloat(document.getElementById('lightPower').value);
+            const hours = parseFloat(document.getElementById('lightHours').value);
+            const days = parseFloat(document.getElementById('lightDays').value);
+
+            if (!validate(num, power, hours, days)) return;
+
+            const energy = (num * power * hours * days) / 1000;
+            const cost = energy * 6;
+
+            document.getElementById('lightEnergy').textContent = energy.toFixed(2);
+            document.getElementById('lightCost').textContent = '₹' + cost.toFixed(2);
+            document.getElementById('lightResult').classList.add('show');
+        }
+
+        function clearLight() {
+            document.getElementById('lightNum').value = '1';
+            document.getElementById('lightPower').value = '20';
+            document.getElementById('lightHours').value = '10';
+            document.getElementById('lightDays').value = '30';
+            document.getElementById('lightResult').classList.remove('show');
+        }
+
+        // AC CALCULATOR
+        function calcAC() {
+            const num = parseFloat(document.getElementById('acNum').value);
+            const power = parseFloat(document.getElementById('acPower').value);
+            const hours = parseFloat(document.getElementById('acHours').value);
+            const days = parseFloat(document.getElementById('acDays').value);
+
+            if (!validate(num, power, hours, days)) return;
+
+            const energy = (num * power * hours * days) / 1000;
+            const cost = energy * 6;
+
+            document.getElementById('acEnergy').textContent = energy.toFixed(2);
+            document.getElementById('acCost').textContent = '₹' + cost.toFixed(2);
+            document.getElementById('acResult').classList.add('show');
+        }
+
+        function clearAC() {
+            document.getElementById('acNum').value = '1';
+            document.getElementById('acPower').value = '1500';
+            document.getElementById('acHours').value = '6';
+            document.getElementById('acDays').value = '30';
+            document.getElementById('acResult').classList.remove('show');
+        }
+
+        // CUSTOM CALCULATOR
+        function calcCustom() {
+            const name = document.getElementById('customName').value;
+            const num = parseFloat(document.getElementById('customNum').value);
+            const power = parseFloat(document.getElementById('customPower').value);
+            const hours = parseFloat(document.getElementById('customHours').value);
+            const days = parseFloat(document.getElementById('customDays').value);
+
+            if (!validate(num, power, hours, days)) return;
+
+            const energy = (num * power * hours * days) / 1000;
+            const cost = energy * 6;
+
+            document.getElementById('customNameDisplay').textContent = name;
+            document.getElementById('customEnergy').textContent = energy.toFixed(2);
+            document.getElementById('customCost').textContent = '₹' + cost.toFixed(2);
+            document.getElementById('customResult').classList.add('show');
+        }
+
+        function clearCustom() {
+            document.getElementById('customName').value = 'Equipment';
+            document.getElementById('customNum').value = '1';
+            document.getElementById('customPower').value = '100';
+            document.getElementById('customHours').value = '5';
+            document.getElementById('customDays').value = '30';
+            document.getElementById('customResult').classList.remove('show');
+        }
+    </script>
+</body>
+</html>
